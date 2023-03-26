@@ -1,3 +1,5 @@
+import { useQuery } from "react-query"
+
 async function fetchComments(id) {
     const response = await fetch(`https://jsonplaceholder.typicode.com/comments/${id}`, {method: 'GET'})
     return response.json()
@@ -14,20 +16,20 @@ async function updatePost(id){
 }
 
 export function PostDetail({ post }) {
-    // replace with useQuery
-    const data = [];
-  
-    return (
+  const { data, isError, isFetching } = useQuery(['postComments', post.id], () => fetchComments(post.id))
+
+  if(isFetching) return <p>Loading....</p>
+  if(isError) return <h3>Something went wrong, try again!</h3>
+
+  return (
       <>
-        <h3 style={{ color: "blue" }}>{post.title}</h3>
+        <h3>{post.title}</h3>
         <button>Delete</button> <button>Update title</button>
         <p>{post.body}</p>
         <h4>Comments</h4>
-        {data.map((comment) => (
-          <li key={comment.id}>
-            {comment.email}: {comment.body}
-          </li>
-        ))}
+        <li key={data.id}>
+            ({data.email}): {data.body}
+        </li>
       </>
     );
 }
